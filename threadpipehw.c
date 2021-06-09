@@ -1,0 +1,102 @@
+//
+// Thread programming homework
+// A simple thread pipeline (multiple single producer and consumer version)
+// Student Name : 김형원
+// Student Number : B735137
+//
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <assert.h>
+
+struct autoPart {
+	int partNumber;
+	struct autoPart *next;
+};
+
+struct autoPartBox {
+	int bid;	// autoPartBox id
+	int SIZE;	// SIZE Of autoPartBox
+	int count;  // the number of autoParts in the Box
+	struct autoPart *lastPart;	// Pointer to the last auto part
+	struct autoPart *firstPart; // Pointer to the first auto part
+	pthread_mutex_t mutex;
+	pthread_cond_t full;
+	pthread_cond_t empty;
+};
+
+struct stageArg {
+	int sid;
+	int defectNumber;
+};
+
+#define ENDMARK -1
+struct autoPartBox *AutoBox;
+pthread_barrier_t barrier;
+
+void sendAutoPart(int id, struct autoPart *ap, struct autoPartBox *apBox) {
+	printf("SEND:: Stage %d thread waiting on autPartBox %d full \n",id,apBox->bid);
+	printf("SEND:: Stage %d sending autoPart %d to autoPartBox %d\n",id,apBox->lastPart->partNumber,apBox->bid);
+	printf("SEND:: Stage %d signals autoBoxPart %d NOT empty\n",id,apBox->bid);
+}
+
+struct autoPart *receiveAutoPart(int id, struct autoPartBox *apBox) {
+	printf("RECEIVE:: Stage %d waiting on autoPartBox %d empty\n",id,apBox->bid);
+	printf("RECEIVE:: Stage %d receiving autoPart %d from autoPartBox %d\n",id,autoPtr->partNumber,apBox->bid);
+	printf("RECEIVE:: Stage %d signals autoPartBox %d NOT full\n",id,apBox->bid);
+	return(autoPtr);
+}
+
+// Generate autoParts and put the autoParts into the first autoPartBox
+void *startThread(void *ag) {
+	
+	printf("Start Thread Stage %d sending autoPart %d to autoPartBox %d\n",0,autoPtr->partNumber,0);
+	printf("Start Thread Stage %d sending ENDMARK to autoPartBox %d\n",0,0);
+	
+}
+
+// Get autoParts from the last autoPartBox and add all of them
+void *endThread(void *id) {
+	
+	printf("End Thread Stage %d receiving autoPart %d from autoPartBox %d\n",tid,autoPtr->partNumber,tid-1);
+	printf("End Thread Stage %d receiving ENDMARK from autoPartBox %d\n",id,tid-1);
+
+}
+
+// Check autoParts from the input box and remove faulty parts
+// Add all faulty parts number; Put valid autoParts into the output box
+// The faulty part number is a multiple of the stage defect number
+void *stageThread(void *ptr) {
+	
+	printf("Stage %d receiving autoPart %d from autoPartBox %d\n",stArg->sid,autoPtr->partNumber,stArg->sid-1);	
+	printf("Stage %d deleting autoPart %d\n",stArg->sid,autoPtr->partNumber);
+	printf("Stage %d sending autoPart %d to autoPartBox %d\n",stArg->sid,autoPtr->partNumber,stArg->sid);
+	printf("Stage %d receiving ENDMARK from autoPartBox %d\n",stArg->sid,stArg->sid-1);
+	printf("Stage %d sending ENDMARK to autoPartBox %d\n",stArg->sid,stArg->sid);
+
+}
+
+int main(int argc, char *argv[]) {
+
+	long int startThreadSum, endThreadSum, stageThreadSum;
+	int i; void *status;
+
+	startThreadSum = endThreadSum = stageThreadSum = 0;
+	srand(100);
+	
+
+	printf("*** Part Sum Information ***\n");
+	pthread_join(startTid,&status); printf("startThread sum %ld\n", status);
+	startThreadSum = status;
+	pthread_join(endTid,&status); printf("endThread sum %ld\n", status); 
+	endThreadSum = status;
+	for(i=0; i < nStages; i++) {
+		pthread_join(stageTid[i],&status); stageThreadSum += status;
+		printf("Stage %d sum %ld\n", i,status);
+	}
+
+	assert(startThreadSum == (endThreadSum+stageThreadSum));
+
+	pthread_exit(0);
+
+}
