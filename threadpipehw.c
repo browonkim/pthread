@@ -69,8 +69,10 @@ struct autoPart *receiveAutoPart(int id, struct autoPartBox *apBox)
 void *startThread(void *ag)
 {
 	//autoPart 부품을 만들어야함
-	autoPart newPart;
-	autoPart *autoPtr;
+	autoPart todo_autoPart;
+	todo_autoPart.next = NULL;
+	todo_autoPart.partNumber = 0;
+	autoPart *autoPtr = &todo_autoPart;
 
 	printf("Start Thread Stage %d sending autoPart %d to autoPartBox %d\n", 0, autoPtr->partNumber, 0);
 	printf("Start Thread Stage %d sending ENDMARK to autoPartBox %d\n", 0, 0);
@@ -81,8 +83,12 @@ void *startThread(void *ag)
 // Get autoParts from the last autoPartBox and add all of them
 void *endThread(void *id)
 {
-	int tid;
+	int tid = 0;
 	autoPart *autoPtr;
+	autoPart todo_autoPart;
+	todo_autoPart.next = NULL;
+	todo_autoPart.partNumber = 0;
+	autoPtr = &todo_autoPart;
 	printf("End Thread Stage %d receiving autoPart %d from autoPartBox %d\n", tid, autoPtr->partNumber, tid - 1);
 	printf("End Thread Stage %d receiving ENDMARK from autoPartBox %d\n", id, tid - 1);
 
@@ -94,8 +100,15 @@ void *endThread(void *id)
 // The faulty part number is a multiple of the stage defect number
 void *stageThread(void *ptr)
 {
-	stageArg *stArg;
-	autoPart *autoPtr;
+
+	stageArg todo_stageArg;
+	todo_stageArg.defectNumber = 0;
+	todo_stageArg.sid = 0;
+	autoPart todo_autoPart;
+	todo_autoPart.next = NULL;
+	todo_autoPart.partNumber = 0;
+	stageArg *stArg = &todo_stageArg;
+	autoPart *autoPtr = &todo_autoPart;
 	printf("Stage %d receiving autoPart %d from autoPartBox %d\n", stArg->sid, autoPtr->partNumber, stArg->sid - 1);
 	printf("Stage %d deleting autoPart %d\n", stArg->sid, autoPtr->partNumber);
 	printf("Stage %d sending autoPart %d to autoPartBox %d\n", stArg->sid, autoPtr->partNumber, stArg->sid);
@@ -107,7 +120,7 @@ void *stageThread(void *ptr)
 
 int main(int argc, char *argv[])
 {
-
+	//main 인자값들 배정하기
 	if (argc < 5)
 	{
 		printf("Usage: <executable> NSTAGES BOXSIZE NPART defect_numbers\n");
@@ -138,20 +151,30 @@ int main(int argc, char *argv[])
 		defectNumbers[i] = atoi(argv[i+4]);
 	}
 
-	pthread_barrier_init(&barrier, NULL, (NSTAGES+2));
+	//배리어 초기화
+	pthread_barrier_init(&barrier, NULL, (NSTAGES+3));
 
+	//thread 변수 선언 및 thread 생성
 	long int startThreadSum, endThreadSum, stageThreadSum;
 	void *status;
 	startThreadSum = endThreadSum = stageThreadSum = 0;
 	srand(100);
 	pthread_t startTid, endTid;
-	int nStages;
-	pthread_t stageTid[100];
+	pthread_t * stageTid;
+	stageTid = malloc(sizeof(pthread_t) * NSTAGES);
 	int startArg, endArg;
 	pthread_attr_t startAttribute, endAttribute;
 
+	int * stageArgs;
+	stageArgs = malloc(sizeof(int) * NSTAGES);
+
 	pthread_create(&startThread, &startAttribute, startThread, (void *)&startArg);
 	pthread_create(&endTid, &endAttribute, endThread, (void *)&endArg);
+	
+	for (i = 0; i < NSTAGES; i++)
+	{
+		pthread_create((stageTid + i), NULL, stageThread, (void *)(stageArgs + i));
+	}
 
 	pthread_barrier_wait(&barrier);
 	printf("*** Part Sum Information ***\n");
@@ -162,7 +185,7 @@ int main(int argc, char *argv[])
 	printf("endThread sum %ld\n", status);
 	endThreadSum = status;
 
-	for (i = 0; i < nStages; i++)
+	for (i = 0; i < NSTAGES; i++)
 	{
 		pthread_join(stageTid[i], &status);
 		stageThreadSum += (long)status;
@@ -171,6 +194,8 @@ int main(int argc, char *argv[])
 
 	assert(startThreadSum == (endThreadSum + stageThreadSum));
 
+	free(stageTid);
+	free(stageArgs);
 	free(defectNumbers);
 	free(AutoBox);
 	pthread_exit(0);
