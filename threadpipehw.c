@@ -163,13 +163,12 @@ int main(int argc, char *argv[])
 	pthread_t * stageTid;
 	stageTid = malloc(sizeof(pthread_t) * NSTAGES);
 	int startArg, endArg;
-	pthread_attr_t startAttribute, endAttribute;
 
 	int * stageArgs;
 	stageArgs = malloc(sizeof(int) * NSTAGES);
 
-	pthread_create(&startTid, &startAttribute, startThread, (void *)&startArg);
-	pthread_create(&endTid, &endAttribute, endThread, (void *)&endArg);
+	pthread_create(&startTid, NULL, startThread, (void *)&startArg);
+	pthread_create(&endTid, NULL, endThread, (void *)&endArg);
 	
 	for (i = 0; i < NSTAGES; i++)
 	{
