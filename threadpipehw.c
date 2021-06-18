@@ -168,7 +168,7 @@ int main(int argc, char *argv[])
 	int * stageArgs;
 	stageArgs = malloc(sizeof(int) * NSTAGES);
 
-	pthread_create(&startThread, &startAttribute, startThread, (void *)&startArg);
+	pthread_create(&startTid, &startAttribute, startThread, (void *)&startArg);
 	pthread_create(&endTid, &endAttribute, endThread, (void *)&endArg);
 	
 	for (i = 0; i < NSTAGES; i++)
@@ -180,10 +180,10 @@ int main(int argc, char *argv[])
 	printf("*** Part Sum Information ***\n");
 	pthread_join(startTid, &status);
 	printf("startThread sum %ld\n", status);
-	startThreadSum = status;
+	startThreadSum = (long) status;
 	pthread_join(endTid, &status);
 	printf("endThread sum %ld\n", status);
-	endThreadSum = status;
+	endThreadSum = (long) status;
 
 	for (i = 0; i < NSTAGES; i++)
 	{
