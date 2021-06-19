@@ -256,6 +256,7 @@ int main(int argc, char *argv[])
 		stageThreadSum += (long)status;
 		printf("Stage %d sum %ld\n", i, status);
 	}
+	startThreadSum += 1;
 	assert(startThreadSum == (endThreadSum + stageThreadSum));
 	free(stageTid);
 	free(stageArgs);
