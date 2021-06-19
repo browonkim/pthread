@@ -1,0 +1,5 @@
+#untracked files:
+*.*
+*
+!threadpipehw.c
+!.gitignore
