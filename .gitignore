@@ -3,3 +3,5 @@
 *
 !threadpipehw.c
 !.gitignore
+!run
+!tp
