@@ -1,8 +1,7 @@
 //
 // Thread programming homework
 // A simple thread pipeline (multiple single producer and consumer version)
-// Student Name : 김형원
-// Student Number : B735137
+// Name : 김형원
 //
 #include <stdio.h>
 #include <stdlib.h>
