@@ -10,7 +10,7 @@ Linux의 Pthread를 사용하여 Producer/Consumer 작동을 응용하여
  아래 그림과 같이 startThread 와 endThread 사이에는 N 개의 stageThread가 존재하고 각각의 Thread 사이에는 autoPartBox 가 있어 
  autoPart를 주고받는 데 사용합니다. autoPartBox는 크기가 정해져 있어 해당 크기만큼의 부품을 받으면 더 이상 받을 수가 없습니다.  
   
- ![Structure_diagram](./structure_diagram.jpg)
+ ![Structure_diagram](./thread.jpg)
  각 thread의 역할은 다음과 같습니다.
 
 ## 1) startThread
