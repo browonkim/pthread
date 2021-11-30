@@ -1,5 +1,3 @@
-//
-// Thread programming homework
 // A simple thread pipeline (multiple single producer and consumer version)
 // Name : 김형원
 //
